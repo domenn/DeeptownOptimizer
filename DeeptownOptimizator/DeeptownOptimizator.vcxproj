@@ -111,6 +111,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="GameObjectContainer.h" />
+    <ClInclude Include="Item.h" />
+    <ClInclude Include="ItemNames.h" />
+    <ClInclude Include="Launcher.h" />
+    <ClInclude Include="MyHelperUtils.h" />
+    <ClInclude Include="Process.h" />
+    <ClInclude Include="Processors.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="GameObjectContainer.cpp" />
+    <ClCompile Include="Item.cpp" />
+    <ClCompile Include="Launcher.cpp" />
+    <ClCompile Include="MyHelperUtils.cpp" />
+    <ClCompile Include="Process.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
