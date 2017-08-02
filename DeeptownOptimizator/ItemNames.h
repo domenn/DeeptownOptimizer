@@ -1,6 +1,50 @@
 #pragma once
+#include <iostream>
+#include <vector>
+#include <sstream>
 
-enum ItemNames {
+/*
+
+#define SOME_ENUM(DO) \
+DO(Foo) \
+DO(Bar) \
+DO(Baz)
+
+#define MAKE_ENUM(VAR) VAR,
+enum MetaSyntacticVariable{
+SOME_ENUM(MAKE_ENUM)
+};
+
+#define MAKE_STRINGS(VAR) #VAR,
+const char* const MetaSyntacticVariableNames[] = {
+SOME_ENUM(MAKE_STRINGS)
+};
+
+*/
+
+
+
+#define AWESOME_MAKE_ENUM(name, ...) enum class name { __VA_ARGS__, __COUNT}; \
+inline std::ostream& operator<<(std::ostream& os, name value) { \
+std::string enumName = #name; \
+std::string str = #__VA_ARGS__; \
+int len = str.length(); \
+std::vector<std::string> strings; \
+std::ostringstream temp; \
+for(int i = 0; i < len; i ++) { \
+if(isspace(str[i])) continue; \
+else if(str[i] == ',') { \
+strings.push_back(temp.str()); \
+temp.str(std::string());\
+} \
+else temp<< str[i]; \
+} \
+strings.push_back(temp.str()); \
+os << enumName << "::" << strings[static_cast<int>(value)]; \
+return os;}
+
+
+AWESOME_MAKE_ENUM(ItemName,
 	COAL,
 	COPPER,
 	IRON,
@@ -26,7 +70,6 @@ enum ItemNames {
 	ALUMINIUM_BAR,
 	STEEL_BAR,
 	SILVER_BAR,
-	COAL,
 	GOLD_BAR,
 	STEEL_PLATE,
 
@@ -74,4 +117,4 @@ enum ItemNames {
 	ETHANOL,
 	REFINED_OIL,
 	PLASTIC
-};
+);

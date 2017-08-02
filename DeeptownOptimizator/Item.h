@@ -1,12 +1,14 @@
 #pragma once
-#include <string>
-class Item
+#include "ItemNames.h"
+#include "NamedGameThing.h"
+class Item : public NamedGameThing
 {
 private:
-	std::string name;
 	int price;
+	int index;
 public:
-	Item();
+	
+	Item(std::string &name, int price);
 	~Item();
 };
 

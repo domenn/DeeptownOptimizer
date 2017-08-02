@@ -5,16 +5,17 @@
 #include "Launcher.h"
 #include <vector>
 #include "MyHelperUtils.h"
+#include "GameObjectContainer.h"
 
 Launcher::Launcher(int argc, std::string * argv)
 {
-
+	GameObjectContainer gameObject = GameObjectContainer::createDefaultGameObjectContainer();
 	delete[] argv;
 }
 
 Launcher::~Launcher()
 {
-
+	
 }
 
 int main(int argc, char *argv[]) {
@@ -25,4 +26,5 @@ int main(int argc, char *argv[]) {
 		args[i].assign(argv[i]);
 	}
 	Launcher(argc, args);
+	return 0;
 }

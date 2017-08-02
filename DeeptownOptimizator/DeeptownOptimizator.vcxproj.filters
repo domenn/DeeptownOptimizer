@@ -27,13 +27,19 @@
     <ClInclude Include="ItemNames.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Processors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GameObjectContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MyHelperUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MatchStringToEnum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Processor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NamedGameThing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -51,6 +57,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MyHelperUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MatchStringToEnum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sandbox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Processor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NamedGameThing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -75,6 +75,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -115,16 +116,22 @@
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemNames.h" />
     <ClInclude Include="Launcher.h" />
+    <ClInclude Include="MatchStringToEnum.h" />
     <ClInclude Include="MyHelperUtils.h" />
+    <ClInclude Include="NamedGameThing.h" />
     <ClInclude Include="Process.h" />
-    <ClInclude Include="Processors.h" />
+    <ClInclude Include="Processor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameObjectContainer.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="Launcher.cpp" />
+    <ClCompile Include="MatchStringToEnum.cpp" />
     <ClCompile Include="MyHelperUtils.cpp" />
+    <ClCompile Include="NamedGameThing.cpp" />
     <ClCompile Include="Process.cpp" />
+    <ClCompile Include="Processor.cpp" />
+    <ClCompile Include="Sandbox.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
