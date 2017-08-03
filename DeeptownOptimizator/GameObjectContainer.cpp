@@ -12,7 +12,7 @@
 #include "MatchStringToEnum.h"
 
 
-int GameObjectContainer::currentIndex = -1;
+
 
 
 GameObjectContainer::GameObjectContainer()
@@ -59,7 +59,7 @@ GameObjectContainer GameObjectContainer::createDefaultGameObjectContainer()
 	GameObjectContainer container = GameObjectContainer();
 	//Create items .... Read from file probably
 	std::string sampleInputItems = "COAL 1\nCOPPER 2\nIRON 3\nAMBER 4\nCOPPER_BAR 25\nIRON_BAR 40\nGOLD 10\nGOLD_BAR 250\nCIRCUITS 2070\nAMBER_INSULATION 125\nINSULATED_WIRE 750\nWATER 5\nCLEAN_WATER 1200\nHYDROGEN 400\nOXYGEN 900";
-	container.read_objects_into(std::istringstream(sampleInputItems), container.items);
+	MyHelperUtils::read_objects_into(std::istringstream(sampleInputItems), container.items);
 	// TODO read from file. Now hardcode a string
 	std::string sampleInput = "5,COPPER:1,COPPER_BAR:SMELTER:10\n"
 		"5,IRON:1,IRON_BAR:SMELTER:15\n"
@@ -69,7 +69,7 @@ GameObjectContainer GameObjectContainer::createDefaultGameObjectContainer()
 
 	//Another file ... processors
 	std::string sampleInputProcessors = "CRAFTING 6\nCHEM 2\nSMELTER 8\nJEWELCRAFTER 2\nGREENHOUSE 3";
-	container.read_objects_into(std::istringstream(sampleInputProcessors), container.processors);
+	MyHelperUtils::read_objects_into(std::istringstream(sampleInputProcessors), container.processors);
 
 	// Finally we fill processes / recepies
 	std::istringstream strstream(sampleInput);
@@ -86,13 +86,62 @@ GameObjectContainer GameObjectContainer::createDefaultGameObjectContainer()
 
 		container.processes.emplace_back(inputs, outputs, time, (Processor*)ptr);
 	}
+	// Load height resources data
+	std::string sample_heights = "1; coal 100\n"
+		"2; coal 70 copper 30\n"
+		"3; coal 59 copper 28\n"
+		"coal 54 copper 32\n"
+		"5; coal 48 copper 36 iron 11\n6;coal 43 copper 40 iron 12\ncoal 38 copper 45 iron 13\n8;coal 33 copper 49 iron 14\ncoal 27 copper 53 iron 15\ncoal 22 copper 57 iron 16\n11;coal 17 copper 61 iron 17\ncoal 12 copper 65 iron 18\n13;copper 100\ncopper 70 iron 30\ncopper 58 iron 19\n16;copper 52 iron 19 amber 15\ncopper 46 iron 19 amber 20\n18;copper 40 amber 25 iron 18\ncopper 35 amber 30 iron 18\n20;amber 35 copper 29 iron 18 ALUMINIUM 11\n";
+	
+	std::istringstream sample_heights_stream(sample_heights);
+	int lineNumber = 1;
+	while (std::getline(sample_heights_stream, line)) {
+		while (MyHelperUtils::stringContains(line, ";")) {
+			line.erase(0, 1);
+		}
+		std::istringstream lineStream(line);
+		std::string itmName;
+		int number;
+		// TODO I have failed. I can't name gather items .. I have to reference them using stored Item instances
+		while (lineStream >> itmName) {
+			MyHelperUtils::toUpper(itmName);
+			auto itm_ptr = (Item*)MyHelperUtils::findInVectorByString(container.items, itmName);
+			lineStream >> number;
+			container.heightMap.emplace_back(number,lineNumber, itm_ptr);
+		}
+		++lineNumber;
+	}
 
-	return GameObjectContainer();
+	//TODO for now hardcode chem number ... later need to read from some config
+	container.chem_mine_number = 9;
+	// Mine speeds can be baked into software. No big deal
+	char mineSpeeds[]{ 3,4,5,6,8,12,15,17 };
+	// TODO mine levels from file later
+	char mineLevels[]{ 8,8,8,7,7,4,5,7,8,8,7,8 };
+	int itms = sizeof(mineLevels) / sizeof(char);
+	for (int i = 0; i < itms; ++i) {
+		container.mines.emplace_back(mineSpeeds[mineLevels[i]-1], mineLevels[i]);
+	}
+
+	//TODO maxheight hardcoded. Change to properties ..
+	container.maxDepth = 20;
+	
+	return container;
 }
 
-int GameObjectContainer::generateUniqueIndex()
+int GameObjectContainer::getMaxDepth()
 {
-	return ++currentIndex;
+	return maxDepth;
+}
+
+std::vector<HeightMapping>* GameObjectContainer::ptrHeightMap()
+{
+	return &heightMap;
+}
+
+std::vector<Mine>* GameObjectContainer::ptrMines()
+{
+	return &mines;
 }
 
 GameObjectContainer::~GameObjectContainer()

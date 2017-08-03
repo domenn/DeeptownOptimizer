@@ -4,6 +4,7 @@
 
 
 #include "MyHelperUtils.h"
+#include <algorithm>
 
 
 
@@ -18,4 +19,18 @@ std::vector<std::string> MyHelperUtils::split (std::string str, char sep) {
 		current = strtok(NULL, separator);
 	}
 	return arr;
+}
+
+bool MyHelperUtils::stringContains(std::string source, std::string seekThis)
+{
+	if (source.find(seekThis) != std::string::npos) {
+		return true;
+	}
+	return false;
+}
+
+
+void MyHelperUtils::toUpper(std::string &str)
+{
+	std::transform(str.begin(), str.end(), str.begin(), ::toupper);
 }
