@@ -16,6 +16,7 @@ public:
 	void setHeightMapping(HeightMapping * pMapping);
 	const std::vector<HeightResource>* const getProductions();
 	char getSpeed() const;
+	char getLevel() const;
 	double getSpeedFractional() const;
 	~Mine();
 };

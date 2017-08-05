@@ -2,6 +2,7 @@
 #include "GameObjectContainer.h"
 #include <algorithm>
 #include <vector>
+#include <iostream>
 #include <memory>
 
 void Optimizer::generateRandomSetup()
@@ -10,11 +11,12 @@ void Optimizer::generateRandomSetup()
 	std::vector<Mine> * mines = gameObject.ptrMines();
 	std::vector<HeightMapping> * heights = gameObject.ptrHeightMap();
 	for (int i = 0; i < mines->size(); ++i) {
-		// TODO: on setHeight, get actual item from heights map and assign it to mine. So mine will know how much it produces.
 		// Other way assignment is not needed.
-		mines->at(i).setHeightMapping(&(gameObject.ptrHeightMap()->at(i)));
+		mines->at(i).setHeightMapping(&(gameObject.ptrHeightMap()->at(mineDistribution[i])));
 	}
 }
+
+using namespace std;
 
 Optimizer::Optimizer(GameObjectContainer & pGameObject) :gameObject(pGameObject)
 {
@@ -26,6 +28,10 @@ Optimizer::Optimizer(GameObjectContainer & pGameObject) :gameObject(pGameObject)
 
 	generateRandomSetup();
 	calculateMoney();
+
+
+
+
 }
 
 void Optimizer::calculateMoney() {
@@ -39,10 +45,25 @@ void Optimizer::calculateMoney() {
 		auto income = m.getProductions();
 		for (auto &incomeItem : *income) {
 			auto speed = m.getSpeed();
-			// TODO line below crashes
 			arr[incomeItem.item->getIndex()] += incomeItem.numberPercentageFraction() * speed;
 		}
 	}
+
+
+	// Now write out some stuff ... debugging purposes
+	cout << "Generated distribution: " << endl;
+	for (auto & mn : *mines) {
+		cout << (int)mn.getLevel() << " : " << mn.getHeight() << endl;
+	}
+
+	cout << endl << endl;
+
+	for (int i = 0; i < gameObject.ptrItems()->size(); ++i) {
+		if (arr[i] > 0.0001) {
+			cout << gameObject.ptrItems()->at(i).itemName() << " : " << arr[i] << endl;
+		}
+	}
+
 	// Then, chems 
 
 	// Then processing devices ... Now there's a problem. If I evaluate smelter first, I 

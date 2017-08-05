@@ -27,6 +27,11 @@ char Mine::getSpeed() const
 	return speed;
 }
 
+char Mine::getLevel() const
+{
+	return level;
+}
+
 double Mine::getSpeedFractional() const
 {
 	return speed * 0.01;

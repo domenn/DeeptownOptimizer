@@ -5,7 +5,6 @@
 
 #include "MyHelperUtils.h"
 #include <algorithm>
-#include <cstring>
 
 
 std::vector<std::string> MyHelperUtils::split (std::string str, char sep) {

@@ -13,12 +13,10 @@ class GameObjectContainer
 	std::vector<Mine> mines;
 	int maxDepth;
 
-	GameObjectContainer();
 	std::vector<std::tuple<int, Item*>> get_inputs_outputs(std::string line_split);
-
 	
 public:
-	static GameObjectContainer createDefaultGameObjectContainer();
+	GameObjectContainer();
 	int getMaxDepth();
 	std::vector<HeightMapping>* ptrHeightMap();
 	std::vector<Mine>* ptrMines();

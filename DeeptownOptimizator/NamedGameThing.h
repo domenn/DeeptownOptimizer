@@ -12,7 +12,7 @@ public:
 
 	static int generateUniqueIndex();
 
-	const std::string* const itemName() const;
+	const std::string& const itemName() const;
 	bool equals(NamedGameThing* other);
 	bool equals(NamedGameThing& other);
 	bool operator==(NamedGameThing &other);

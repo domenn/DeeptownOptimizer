@@ -3,8 +3,6 @@
 
 #include <vector>
 #include <string>
-#include <sstream>
-
 class MyHelperUtils
 {
 public:
@@ -24,7 +22,7 @@ inline const void * const MyHelperUtils::findInVectorByString(std::vector<T> &th
 	for (int i = 0; i<the_vector.size(); ++i)
 	{
 		T* itm = vec_array + i;
-		if (to_find == *itm->itemName())
+		if (to_find == itm->itemName())
 		{
 			return itm;
 		}

@@ -11,9 +11,9 @@ NamedGameThing::~NamedGameThing()
 {
 }
 
-const std::string * const NamedGameThing::itemName() const
+const std::string & const NamedGameThing::itemName() const
 {
-	return &name;
+	return name;
 }
 
 bool NamedGameThing::equals(NamedGameThing * other)

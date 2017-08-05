@@ -10,7 +10,7 @@
 
 Launcher::Launcher(int argc, std::string * argv)
 {
-	GameObjectContainer gameObject = GameObjectContainer::createDefaultGameObjectContainer();
+	GameObjectContainer gameObject;
 	Optimizer optimizer(gameObject);
 	delete[] argv;
 }
