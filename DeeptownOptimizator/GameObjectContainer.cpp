@@ -102,7 +102,6 @@ GameObjectContainer GameObjectContainer::createDefaultGameObjectContainer()
 		std::istringstream lineStream(line);
 		std::string itmName;
 		int number;
-		// TODO I have failed. I can't name gather items .. I have to reference them using stored Item instances
 		while (lineStream >> itmName) {
 			MyHelperUtils::toUpper(itmName);
 			auto itm_ptr = (Item*)MyHelperUtils::findInVectorByString(container.items, itmName);
