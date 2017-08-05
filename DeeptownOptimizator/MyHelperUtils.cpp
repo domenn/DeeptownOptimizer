@@ -5,7 +5,7 @@
 
 #include "MyHelperUtils.h"
 #include <algorithm>
-
+#include <cstring>
 
 
 std::vector<std::string> MyHelperUtils::split (std::string str, char sep) {
@@ -15,7 +15,7 @@ std::vector<std::string> MyHelperUtils::split (std::string str, char sep) {
 	std::vector<std::string> arr;
 	current = strtok(cstr, separator);
 	while (current != NULL) {
-		arr.push_back(current);
+		arr.emplace_back(current);
 		current = strtok(NULL, separator);
 	}
 	return arr;

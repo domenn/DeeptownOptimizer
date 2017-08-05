@@ -81,7 +81,7 @@ GameObjectContainer GameObjectContainer::createDefaultGameObjectContainer()
 		auto inputs = container.get_inputs_outputs(line_split[0]);
 		auto outputs = container.get_inputs_outputs(line_split[1]);
 		// Processor for process
-		void* ptr = MyHelperUtils::findInVectorByString(container.processors, line_split[2]);
+		const void* const ptr = MyHelperUtils::findInVectorByString(container.processors, line_split[2]);
 		int time = std::stoi(line_split[3]);
 
 		container.processes.emplace_back(inputs, outputs, time, (Processor*)ptr);
@@ -99,6 +99,9 @@ GameObjectContainer GameObjectContainer::createDefaultGameObjectContainer()
 		while (MyHelperUtils::stringContains(line, ";")) {
 			line.erase(0, 1);
 		}
+		// TODO replace emplace
+		container.heightMap.push_back(HeightMapping(lineNumber));
+		HeightMapping& refCurrentMapping = container.heightMap.back();
 		std::istringstream lineStream(line);
 		std::string itmName;
 		int number;
@@ -106,7 +109,7 @@ GameObjectContainer GameObjectContainer::createDefaultGameObjectContainer()
 			MyHelperUtils::toUpper(itmName);
 			auto itm_ptr = (Item*)MyHelperUtils::findInVectorByString(container.items, itmName);
 			lineStream >> number;
-			container.heightMap.emplace_back(number,lineNumber, itm_ptr);
+			refCurrentMapping.addResource(itm_ptr, number);
 		}
 		++lineNumber;
 	}
@@ -141,6 +144,11 @@ std::vector<HeightMapping>* GameObjectContainer::ptrHeightMap()
 std::vector<Mine>* GameObjectContainer::ptrMines()
 {
 	return &mines;
+}
+
+std::vector<Item>* GameObjectContainer::ptrItems()
+{
+	return &items;
 }
 
 GameObjectContainer::~GameObjectContainer()

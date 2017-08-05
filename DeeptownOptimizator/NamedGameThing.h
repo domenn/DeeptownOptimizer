@@ -16,5 +16,6 @@ public:
 	bool equals(NamedGameThing* other);
 	bool equals(NamedGameThing& other);
 	bool operator==(NamedGameThing &other);
+	int getIndex() const;
 };
 

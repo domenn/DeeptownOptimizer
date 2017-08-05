@@ -3,12 +3,14 @@
 
 #include <vector>
 #include <string>
+#include <sstream>
+
 class MyHelperUtils
 {
 public:
 	static std::vector<std::string> split(std::string str, char sep);
 	template <typename T>
-	static void* findInVectorByString(std::vector<T> &the_vector, std::string to_find);
+	static const void * const findInVectorByString(std::vector<T> &the_vector, std::string to_find);
 	static bool stringContains(std::string source, std::string seekThis);
 	static void toUpper(std::string & str);
 	template<typename T>
@@ -16,7 +18,7 @@ public:
 };
 
 template<typename T>
-inline void * MyHelperUtils::findInVectorByString(std::vector<T> &the_vector, std::string to_find)
+inline const void * const MyHelperUtils::findInVectorByString(std::vector<T> &the_vector, std::string to_find)
 {
 	T* vec_array = the_vector.data();
 	for (int i = 0; i<the_vector.size(); ++i)

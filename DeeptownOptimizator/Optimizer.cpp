@@ -2,28 +2,69 @@
 #include "GameObjectContainer.h"
 #include <algorithm>
 #include <vector>
+#include <memory>
 
-Optimizer::Optimizer(GameObjectContainer & pGameObject):gameObject(pGameObject)
+void Optimizer::generateRandomSetup()
+{
+	std::random_shuffle(mineDistribution, mineDistribution + gameObject.getMaxDepth());
+	std::vector<Mine> * mines = gameObject.ptrMines();
+	std::vector<HeightMapping> * heights = gameObject.ptrHeightMap();
+	for (int i = 0; i < mines->size(); ++i) {
+		// TODO: on setHeight, get actual item from heights map and assign it to mine. So mine will know how much it produces.
+		// Other way assignment is not needed.
+		mines->at(i).setHeightMapping(&(gameObject.ptrHeightMap()->at(i)));
+	}
+}
+
+Optimizer::Optimizer(GameObjectContainer & pGameObject) :gameObject(pGameObject)
 {
 	// TODO testing code ... just calculate numbers. Later add logic.
 	mineDistribution = new int[gameObject.getMaxDepth()];
 	for (int i = 0; i < gameObject.getMaxDepth(); ++i) {
 		mineDistribution[i] = i;
 	}
-	
-	std::vector<Mine> * mines = gameObject.ptrMines();
-	std::vector<HeightMapping> * heights = gameObject.ptrHeightMap();
-	// TODO TO FUNCTION
 
-	std::random_shuffle(mineDistribution, mineDistribution + gameObject.getMaxDepth());
-	for (int i = 0; i < mines->size(); ++i) {
-		// TODO: on setHeight, get actual item from heights map and assign it to mine. So mine will know how much it produces.
-		// Other way assignment is not needed.
-		mines->at(i).setHeight(mineDistribution[i]);
-	}
+	generateRandomSetup();
+	calculateMoney();
 }
+
+void Optimizer::calculateMoney() {
+	// Prepare empty array of material income numbers to fill up and substract down in the proccess.
+	std::unique_ptr<double[]> arr(new double[gameObject.ptrItems()->size()]());
+	//TODO put arr to 0. Actually make somewhere prepared array, then just copy ... measure difference!
+
+	// First, calculate what mines give me ..
+	auto mines = gameObject.ptrMines();
+	for (auto &m : *mines) {
+		auto income = m.getProductions();
+		for (auto &incomeItem : *income) {
+			auto speed = m.getSpeed();
+			// TODO line below crashes
+			arr[incomeItem.item->getIndex()] += incomeItem.numberPercentageFraction() * speed;
+		}
+	}
+	// Then, chems 
+
+	// Then processing devices ... Now there's a problem. If I evaluate smelter first, I 
+	// don't yet have info on crafter produced resources ... Well probably this can be handled 
+	// if I allow sub-zero quantities of materials
+
+	// Now calculate how much I get per minute / second and simply calculate money
+}
+
+
+
+
+
+
+
+
+
+
+
 
 Optimizer::~Optimizer()
 {
 	delete[] mineDistribution;
 }
+

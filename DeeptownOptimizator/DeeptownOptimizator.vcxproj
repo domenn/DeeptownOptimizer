@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{A9A11D8B-F0B8-4B18-94FC-C15EAB735309}</ProjectGuid>
     <RootNamespace>DeeptownOptimizator</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -114,6 +114,7 @@
   <ItemGroup>
     <ClInclude Include="GameObjectContainer.h" />
     <ClInclude Include="HeightMap.h" />
+    <ClInclude Include="HeightResource.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemNames.h" />
     <ClInclude Include="Launcher.h" />

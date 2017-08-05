@@ -22,5 +22,6 @@ public:
 	int getMaxDepth();
 	std::vector<HeightMapping>* ptrHeightMap();
 	std::vector<Mine>* ptrMines();
+	std::vector<Item>* ptrItems();
 	~GameObjectContainer();
 };

@@ -31,6 +31,11 @@ bool NamedGameThing::operator==(NamedGameThing & other)
 	return equals(other);
 }
 
+int NamedGameThing::getIndex() const
+{
+	return uniqueIndex;
+}
+
 int NamedGameThing::generateUniqueIndex()
 {
 	return ++currentIndex;
