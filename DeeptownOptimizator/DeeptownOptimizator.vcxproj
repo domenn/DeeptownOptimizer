@@ -112,6 +112,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="FileNamesMacros.h" />
     <ClInclude Include="GameObjectContainer.h" />
     <ClInclude Include="HeightMap.h" />
     <ClInclude Include="HeightResource.h" />
@@ -125,6 +126,7 @@
     <ClInclude Include="OptimizationAttributes.h" />
     <ClInclude Include="Optimizer.h" />
     <ClInclude Include="Process.h" />
+    <ClInclude Include="ProcessingDevices.h" />
     <ClInclude Include="Processor.h" />
   </ItemGroup>
   <ItemGroup>
@@ -141,6 +143,17 @@
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="Processor.cpp" />
     <ClCompile Include="Sandbox.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Items.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Items.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Recipes.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

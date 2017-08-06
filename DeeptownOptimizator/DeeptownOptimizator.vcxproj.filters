@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ConfigFiles">
+      <UniqueIdentifier>{ce8e168b-e987-47f7-b7a0-edf14b72a266}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Launcher.h">
@@ -57,6 +60,12 @@
     <ClInclude Include="HeightResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FileNamesMacros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessingDevices.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Launcher.cpp">
@@ -98,5 +107,15 @@
     <ClCompile Include="Optimizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Items.config">
+      <Filter>ConfigFiles</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Recipes.config">
+      <Filter>ConfigFiles</Filter>
+    </None>
   </ItemGroup>
 </Project>

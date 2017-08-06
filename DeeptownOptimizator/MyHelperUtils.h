@@ -1,18 +1,25 @@
 #pragma once
 
-
 #include <vector>
 #include <string>
+#include <random>
+
 class MyHelperUtils
 {
+	static std::minstd_rand0 generator;
+
 public:
 	static std::vector<std::string> split(std::string str, char sep);
 	template <typename T>
 	static const void * const findInVectorByString(std::vector<T> &the_vector, std::string to_find);
 	static bool stringContains(std::string source, std::string seekThis);
 	static void toUpper(std::string & str);
+	static void errorExit(const char* str);
+	static void checkFileOpen(std::ifstream& file, const std::string& fileName);
 	template<typename T>
 	static void read_objects_into(std::istream & itemstream, std::vector<T> & the_vector);
+
+	static int randomInt(int from, int toExclusive);
 };
 
 template<typename T>

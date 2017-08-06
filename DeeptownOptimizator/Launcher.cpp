@@ -7,6 +7,7 @@
 #include "MyHelperUtils.h"
 #include "GameObjectContainer.h"
 #include "Optimizer.h"
+#include <ctime>
 
 Launcher::Launcher(int argc, std::string * argv)
 {
@@ -24,7 +25,7 @@ int main(int argc, char *argv[]) {
 	// inputs: number of chems. Number and levels of mines. Number for all processors. Oil income approx. rate (later). Max depth.
 	// For greenhouse things, substract the price of seeds, since it is the only way to get them
 	// Looks like line comments will have to be supported
-	auto splitterTest = MyHelperUtils::split("this:shall_be:splittin", ':');
+	srand(time(0));
 	std::string* args = new std::string[argc];
 	for (int i = 0; i < argc; ++i) {
 		args[i].assign(argv[i]);
