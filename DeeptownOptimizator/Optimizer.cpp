@@ -25,29 +25,61 @@ void Optimizer::generateRandomSetup()
 
 }
 
+const Process* Optimizer::firstProcessorOfType(Devices device) const
+{
+	auto strToFind = Item::findName(device);
+	for (auto i = gameObject.ptrProcesses()->data(); ; ++i)
+	{
+		if (strToFind == i->processor->itemName())
+		{
+			return i;
+		}
+	}
+}
+
+char Optimizer::countDevices(const Process* const begin)
+{
+	char num = 0;
+	auto seekName = &begin->processor->itemName();
+	auto fixedName = seekName;
+	while(*seekName == *fixedName)
+	{
+		++num;
+		++seekName;
+	}
+	return num;
+}
+
 
 Optimizer::Optimizer(GameObjectContainer & pGameObject) :gameObject(pGameObject),
 ptrOil(static_cast<const Item* const>(MyHelperUtils::findInVectorByString(*gameObject.ptrItems(),Item::findName(ItemName::OIL)))),
-ptrSmelter(static_cast<const Processor*> (MyHelperUtils::findInVectorByString(*pGameObject.ptrProcessors(), Item::findName(Devices::SMELTER)))),
-ptrGemCrafter(static_cast<const Processor*> (MyHelperUtils::findInVectorByString(*pGameObject.ptrProcessors(), Item::findName(Devices::JEWELCRAFTER)))),
-ptrCrafter(static_cast<const Processor*> (MyHelperUtils::findInVectorByString(*pGameObject.ptrProcessors(), Item::findName(Devices::CRAFTER)))),
-ptrGreenhouse(static_cast<const Processor*> (MyHelperUtils::findInVectorByString(*pGameObject.ptrProcessors(), Item::findName(Devices::GREENHOUSE)))),
-ptrChem(static_cast<const Processor*> (MyHelperUtils::findInVectorByString(*pGameObject.ptrProcessors(), Item::findName(Devices::CHEM))))
+ptrSmelter(firstProcessorOfType(Devices::SMELTER)),
+ptrGemCrafter(firstProcessorOfType(Devices::JEWELCRAFTER)),
+ptrCrafter(firstProcessorOfType(Devices::CRAFTER)),
+ptrGreenhouse(firstProcessorOfType(Devices::GREENHOUSE)),
+ptrChem(firstProcessorOfType(Devices::CHEM)),
+numSmelterProc(countDevices(ptrSmelter)),
+numGemCrafterProc(countDevices(ptrGemCrafter)),
+numCrafterProc(countDevices(ptrCrafter)),
+numGreenhouseProc(countDevices(ptrGreenhouse)),
+numChemProc(countDevices(ptrChem))
 {
 	// Oil is kind of special item, so I make pointer to it
 	//ptrOil = static_cast<Item*>MyHelperUtils::findInVectorByString(*gameObject.ptrItems(),
 	//	Item::findName(ItemName::OIL));
 	// TODO testing code ... just calculate numbers. Later add logic.
 	mineDistribution = new int[gameObject.getMaxDepth()];
-	for (int i = 0; i < gameObject.getMaxDepth(); ++i) {
+	for (int i = 0; i < gameObject.getMaxDepth(); ++i)
+	{
 		mineDistribution[i] = i;
 	}
 	generateRandomSetup();
 	calculateMoney();
 
+	auto& recipes = *pGameObject.ptrProcesses();
 
 
-
+	int rs = 12;
 }
 
 void Optimizer::calculateMoney() {

@@ -2,7 +2,9 @@
 #include <vector>
 #include "Processor.h"
 #include <vector>
+#include "ProcessingDevices.h"
 
+class Process;
 class Item;
 class GameObjectContainer;
 class Optimizer
@@ -12,16 +14,26 @@ class Optimizer
 	GameObjectContainer & gameObject;
 	std::vector<Item*> chemProductions;
 	const Item* const ptrOil;
-	const Processor* ptrSmelter;
-	const Processor* ptrGemCrafter;
-	const Processor* ptrCrafter;
-	const Processor* ptrGreenhouse;
-	const Processor* ptrChem;
+	const Process* ptrSmelter;
+	const Process* ptrGemCrafter;
+	const Process* ptrCrafter;
+	const Process* ptrGreenhouse;
+	const Process* ptrChem;
+
+	const char numSmelterProc;
+	const char numGemCrafterProc;
+	const char numCrafterProc;
+	const char numGreenhouseProc;
+	const char numChemProc;
+
+
 
 	void calculateMoney();
 	void generateRandomSetup();
 
 public:
+	const Process* firstProcessorOfType(Devices devices) const;
+	static char Optimizer::countDevices(const Process* const begin);
 	Optimizer(GameObjectContainer & pGameObject);
 	~Optimizer();
 };
