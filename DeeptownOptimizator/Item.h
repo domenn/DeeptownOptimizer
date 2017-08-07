@@ -4,9 +4,8 @@
 #include "MyHelperUtils.h"
 class Item : public NamedGameThing
 {
-private:
-	int price;
 public:
+	int price;
 	Item(std::string &name, int price);
 	template <typename T>
 	static std::string findName(T enumName);

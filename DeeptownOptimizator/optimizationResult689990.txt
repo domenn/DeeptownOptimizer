@@ -1,0 +1,27 @@
+Generated height distribution: 
+8 : 10
+8 : 17
+8 : 8
+7 : 2
+7 : 16
+4 : 13
+5 : 7
+7 : 9
+8 : 6
+8 : 12
+7 : 20
+8 : 3
+
+
+How much of each item and money.
+ALUMINIUM : -18.35 : -91.75
+ALUMINIUM_BAR : 4 : 200
+AMBER : -21.6 : -86.4
+AMBER_BRACELET : 0.5 : 140
+AMBER_CHARGER : 12 : 48
+BATTERY : 0.5 : 100
+CIRCUITS : 0.333333 : 133.333
+COAL : 62.9867 : 62.9867
+COPPER : 22.65 : 45.3
+COPPER_BAR : -3.16667 : -79.1667
+COPPER_NAIL : 40 : 280

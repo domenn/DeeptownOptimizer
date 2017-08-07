@@ -13,6 +13,7 @@ Launcher::Launcher(int argc, std::string * argv)
 {
 	GameObjectContainer gameObject;
 	Optimizer optimizer(gameObject);
+	optimizer.optimize();
 	delete[] argv;
 }
 

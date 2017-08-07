@@ -66,6 +66,8 @@ GameObjectContainer::GameObjectContainer()
 	MyHelperUtils::checkFileOpen(itemsFile, FILENAME_ITEMS);
 	MyHelperUtils::read_objects_into(itemsFile, items);
 	itemsFile.close();
+	// Simple trick, manipulate prices of some items to make optimization easier
+	hackItemPrices();
 	// TODO read from file. Now hardcode a string
 	std::ifstream recipesFile(FILENAME_PROCESSES);
 	MyHelperUtils::checkFileOpen(recipesFile, FILENAME_ITEMS);
@@ -78,10 +80,6 @@ GameObjectContainer::GameObjectContainer()
 	std::string line;
 	char * token;
 	while (std::getline(recipesFile, line)) {
-		if (MyHelperUtils::stringContains(line, "REFI"))
-		{
-			std::cout << "hir";
-		}
 		if (MyHelperUtils::stringContains(line, "#") || line == "")
 		{
 			continue;
@@ -157,6 +155,31 @@ GameObjectContainer::GameObjectContainer()
 //	char * token;
 //}
 
+
+void GameObjectContainer::hackItemPrices()
+{
+	auto water = (Item*)MyHelperUtils::findInVectorByString(items, Item::findName(ItemName::WATER));
+	water->price = 0;
+	//seeds
+	for(int i = 0; i<items.size(); ++i)
+	{
+		if (MyHelperUtils::stringContains(items[i].itemName(), "_SEED"))
+		{
+			std::string plant = MyHelperUtils::split(items[i].itemName(), '_')[0];
+			Item* ptrGrownPlant;
+			if(i >0 && plant == items[i-1].itemName())
+			{
+				ptrGrownPlant = &items[i - 1];
+			}
+			else
+			{
+				ptrGrownPlant = (Item*)MyHelperUtils::findInVectorByString(items, plant);
+			}
+			ptrGrownPlant->price -= items[i].price;
+			items[i].price = 0;
+		}
+	}
+}
 
 std::vector<std::tuple<int, Item*>> GameObjectContainer::get_inputs_outputs(std::string line_split)
 {

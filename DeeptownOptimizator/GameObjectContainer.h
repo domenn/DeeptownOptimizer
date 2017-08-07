@@ -15,6 +15,7 @@ class GameObjectContainer
 	int maxDepth;
 	double oilRate;
 
+	void hackItemPrices();
 	std::vector<std::tuple<int, Item*>> get_inputs_outputs(std::string line_split);
 	void fillChemicalMinesVector();
 public:

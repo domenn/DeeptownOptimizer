@@ -9,17 +9,22 @@
 class Process
 {
 public:
-	Process(Process & othr) :inputs(othr.inputs),
+	/*Process(Process & othr) :inputs(othr.inputs),
 		outputs(othr.outputs),
 		timeSeconds(othr.timeSeconds),
 		processor(othr.processor)
 	{
 		std::cout << "CopyCtr" << std::endl;
-	}
+	}*/
 	const std::vector<std::tuple<int,Item*>> inputs;
 	const std::vector<std::tuple<int, Item*>> outputs;
 	const int timeSeconds;
 	const Processor * const processor;
+	const std::vector<double> itemRates;
+	const std::vector<int> itemIndices;
+
+	std::vector<double> calculateRates() const;
+	std::vector<int> calculateIndices() const;
 	Process(std::vector<std::tuple<int, Item*>> inputs, std::vector<std::tuple<int, Item*>> outputs, int timeSeconds, Processor* processor);
 	~Process();
 };

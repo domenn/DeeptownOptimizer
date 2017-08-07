@@ -2,10 +2,8 @@
 #include "NamedGameThing.h"
 
 class Processor : public NamedGameThing {
-private:
-	int numberOfThem;
-
 public:
+	const int numberOfThem;
 	Processor(std::string &name, int numberOfThem);
 	/*CRAFTER,
 	SMELTER,
