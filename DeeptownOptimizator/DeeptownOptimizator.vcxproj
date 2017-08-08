@@ -148,11 +148,24 @@
     <Content Include="Items.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+	    <Content Include="Recipes.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+	    <Content Include="DepthInfo.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+	    <Content Include="PlayerSetup.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Items.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="DepthInfo.config" />
+    <None Include="PlayerSetup.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Recipes.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

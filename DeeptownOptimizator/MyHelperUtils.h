@@ -18,6 +18,7 @@ public:
 	static void checkFileOpen(std::ifstream& file, const std::string& fileName);
 	template<typename T>
 	static void read_objects_into(std::istream & itemstream, std::vector<T> & the_vector);
+	static std::string currentTime();
 
 	static int randomInt(int from, int toExclusive);
 };

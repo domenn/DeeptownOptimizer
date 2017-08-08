@@ -18,11 +18,14 @@ class GameObjectContainer
 	void hackItemPrices();
 	std::vector<std::tuple<int, Item*>> get_inputs_outputs(std::string line_split);
 	void fillChemicalMinesVector();
+	std::string readProcessingDevicesFromConfig() const;
+	void checkRecipesIntegrity();
+	void readUserConfigFile();
 public:
 	static const double CHEM_MINE_SPEED;
 
-	void checkRecipesIntegrity();
 	GameObjectContainer();
+
 	int getMaxDepth() const;
 	std::vector<HeightMapping>* ptrHeightMap();
 	std::vector<Mine>* ptrMines();
@@ -31,6 +34,6 @@ public:
 	std::vector<Processor>* ptrProcessors();
 	std::vector<Process>* ptrProcesses();
 	~GameObjectContainer();
-	int getChemMineNumber();
-	double getOilRate();
+	int getChemMineNumber() const;
+	double getOilRate() const;
 };

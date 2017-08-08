@@ -13,7 +13,7 @@ class HeightMapping
 
 public:
 	HeightMapping(short cHeight);
-	void addResource(const Item* const item, const int numberPercentage);
+	void addResource(const Item*const item, const double numberPercentage);
 	short getHeight();
 	const std::vector<HeightResource>* const getProducingResources();
 

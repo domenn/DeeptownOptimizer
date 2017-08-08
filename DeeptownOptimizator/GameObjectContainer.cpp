@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <fstream>
 #include "FileNamesMacros.h"
+#include "ProcessingDevices.h"
 
 void checkInputsOutputs(const std::vector<std::tuple<int, Item*>> & itms, int processIndex)
 {
@@ -68,17 +69,15 @@ GameObjectContainer::GameObjectContainer()
 	itemsFile.close();
 	// Simple trick, manipulate prices of some items to make optimization easier
 	hackItemPrices();
-	// TODO read from file. Now hardcode a string
 	std::ifstream recipesFile(FILENAME_PROCESSES);
 	MyHelperUtils::checkFileOpen(recipesFile, FILENAME_ITEMS);
 
 	//Another file ... processors
-	std::string sampleInputProcessors = "CRAFTER 6\nCHEM 2\nSMELTER 8\nJEWELCRAFTER 2\nGREENHOUSE 3";
+	std::string sampleInputProcessors = readProcessingDevicesFromConfig();
 	MyHelperUtils::read_objects_into(std::istringstream(sampleInputProcessors), processors);
 
 	// Finally we fill processes / recipes
 	std::string line;
-	char * token;
 	while (std::getline(recipesFile, line)) {
 		if (MyHelperUtils::stringContains(line, "#") || line == "")
 		{
@@ -100,15 +99,12 @@ GameObjectContainer::GameObjectContainer()
 
 		processes.emplace_back(inputs, outputs, time, (Processor*)ptrProcessor);
 	}
+	recipesFile.close();
 	checkRecipesIntegrity();
 	// Load height resources data
-	std::string sample_heights = "1; coal 100\n"
-		"2; coal 70 copper 30\n"
-		"3; coal 59 copper 28\n"
-		"coal 54 copper 32\n"
-		"5; coal 48 copper 36 iron 11\n6;coal 43 copper 40 iron 12\ncoal 38 copper 45 iron 13\n8;coal 33 copper 49 iron 14\ncoal 27 copper 53 iron 15\ncoal 22 copper 57 iron 16\n11;coal 17 copper 61 iron 17\ncoal 12 copper 65 iron 18\n13;copper 100\ncopper 70 iron 30\ncopper 58 iron 19\n16;copper 52 iron 19 amber 15\ncopper 46 iron 19 amber 20\n18;copper 40 amber 25 iron 18\ncopper 35 amber 30 iron 18\n20;amber 35 copper 29 iron 18 ALUMINIUM 11";
 
-	std::istringstream sample_heights_stream(sample_heights);
+
+	std::ifstream sample_heights_stream(FILENAME_DEPTHS);
 	int lineNumber = 1;
 	while (std::getline(sample_heights_stream, line)) {
 		while (MyHelperUtils::stringContains(line, ";")) {
@@ -119,7 +115,7 @@ GameObjectContainer::GameObjectContainer()
 		HeightMapping& refCurrentMapping = heightMap.back();
 		std::istringstream lineStream(line);
 		std::string itmName;
-		int number;
+		double number;
 		while (lineStream >> itmName) {
 			MyHelperUtils::toUpper(itmName);
 			auto itm_ptr = (Item*)MyHelperUtils::findInVectorByString(items, itmName);
@@ -128,26 +124,59 @@ GameObjectContainer::GameObjectContainer()
 		}
 		++lineNumber;
 	}
-
-	// Chem mine items need to get filled
+	sample_heights_stream.close();
 	fillChemicalMinesVector();
+	readUserConfigFile();
+}
 
-	//TODO for now hardcode chem number ... later need to read from some config
-	chem_mine_number = 9;
+void GameObjectContainer::readUserConfigFile()
+{
+	std::ifstream cfgFile(FILENAME_PLAYER_CONFIG);
+	std::string line;
 	// Mine speeds can be baked into software. No big deal
 	char mineSpeeds[]{ 3,4,5,6,8,12,15,17 };
-	// TODO mine levels from file later
-	char mineLevels[]{ 8,8,8,7,7,4,5,7,8,8,7,8 };
-	int itms = sizeof(mineLevels) / sizeof(char);
-	for (int i = 0; i < itms; ++i) {
-		mines.emplace_back(mineSpeeds[mineLevels[i] - 1], mineLevels[i]);
+	while (std::getline(cfgFile, line)) {
+		if (MyHelperUtils::stringContains(line, "#"))
+		{
+			continue;
+		}
+		MyHelperUtils::toUpper(line);
+		if(MyHelperUtils::stringContains(line,"NUMBER_CHEM_MINES"))
+		{
+			chem_mine_number = std::stoi(MyHelperUtils::split(line, ':')[1]);
+		}
+		if (MyHelperUtils::stringContains(line, "MINE_LEVELS"))
+		{
+			std::string value = MyHelperUtils::split(line, ':')[1];
+			auto itms = MyHelperUtils::split(value, ' ');
+			for (auto& itm : itms)
+			{
+				if(MyHelperUtils::stringContains(itm,","))
+				{
+					itm.erase(0, 1);
+					itm.erase(itm.end() - 1);
+					auto numbers = MyHelperUtils::split(itm, ',');
+					int numberOfThem = std::stoi(numbers[0]);
+					int levelOfBundle = std::stoi(numbers[1]);
+					for (int i = 0; i < numberOfThem; ++i) {
+						mines.push_back(Mine(mineSpeeds[levelOfBundle-1], levelOfBundle));
+					}
+				}else
+				{
+					int level = std::stoi(itm);
+					mines.push_back(Mine(mineSpeeds[level-1], level));
+				}
+			}
+		}
+		if (MyHelperUtils::stringContains(line, "MAX_DEPTH"))
+		{
+			maxDepth = std::stoi(MyHelperUtils::split(line, ':')[1]);
+		}
+		if (MyHelperUtils::stringContains(line, "OIL_RATE"))
+		{
+			oilRate = std::stof(MyHelperUtils::split(line, ':')[1]);
+		}
 	}
-
-	//TODO maxheight hardcoded. Change to properties ..
-	maxDepth = 20;
-
-	//TODO oil number hardcoded ... later read from string
-	oilRate = 0.08;
 }
 
 //void parseInputs(const char* const text) {
@@ -257,6 +286,32 @@ void GameObjectContainer::fillChemicalMinesVector() {
 	}*/
 }
 
+std::string GameObjectContainer::readProcessingDevicesFromConfig() const
+{
+	std::ifstream cfgFile(FILENAME_PLAYER_CONFIG);
+	std::string line;
+	std::ostringstream oss;
+	while (std::getline(cfgFile, line)) {
+		if (MyHelperUtils::stringContains(line, "#") || line == "")
+		{
+			continue;
+		}
+		MyHelperUtils::toUpper(line);
+		if ((MyHelperUtils::stringContains(line, Item::findName(Devices::CHEM))
+			|| MyHelperUtils::stringContains(line, Item::findName(Devices::CRAFTER))
+			|| MyHelperUtils::stringContains(line, Item::findName(Devices::GREENHOUSE))
+			|| MyHelperUtils::stringContains(line, Item::findName(Devices::JEWELCRAFTER))
+			|| MyHelperUtils::stringContains(line, Item::findName(Devices::SMELTER)))
+			&& !MyHelperUtils::stringContains(line, "NUMBER"))
+		{
+			oss << line << std::endl;
+		}
+		//bool whiteSpacesOnly = std::all_of(line.begin(), line.end(), isspace);
+		//if (whiteSpacesOnly) { continue; }
+	}
+	return oss.str();
+}
+
 std::vector<Item*>* GameObjectContainer::ptrChemMineItems() {
 	return &chemMineItems;
 }
@@ -275,12 +330,13 @@ GameObjectContainer::~GameObjectContainer()
 {
 }
 
-int GameObjectContainer::getChemMineNumber()
+int GameObjectContainer::getChemMineNumber() const
 {
 	return chem_mine_number;
 }
 
-double GameObjectContainer::getOilRate()
+double GameObjectContainer::getOilRate() const
 {
 	return oilRate;
 }
+

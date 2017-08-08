@@ -21,7 +21,7 @@ void Optimizer::generateRandomSetup()
 	// Set chemical mine randomness
 	std::vector<Item*>* chems = gameObject.ptrChemMineItems();
 	for (int i = 0; i < gameObject.getChemMineNumber(); ++i) {
-		chemProductions.push_back(chems->at(MyHelperUtils::randomInt(0, gameObject.ptrChemMineItems()->size())));
+		chemProductions[i] = chems->at(MyHelperUtils::randomInt(0, gameObject.ptrChemMineItems()->size()));
 	}
 	// Set random process to each device
 	activeProcesses.clear();
@@ -44,9 +44,12 @@ std::vector<int> Optimizer::setInfiniteItemsIndices() const
 	};
 }
 
-void Optimizer::dumpFile() const
+void Optimizer::dumpFile()
 {
+	++fileWritesCounter;
 	// Now write out some stuff ... debugging purposes
+	std::remove((resultsFileName + "_backup.txt").c_str());
+	int rc = std::rename(resultsFileName.c_str(), (resultsFileName + "_backup.txt").c_str());
 	std::string fn(resultsFileName);
 	std::ofstream outFile(fn);
 
@@ -65,7 +68,44 @@ void Optimizer::dumpFile() const
 				<< gameObject.ptrItems()->at(i).price * itemIncomeArrayByIndex[i] << std::endl;
 		}
 	}
-	outFile << "TOTAL MONEY: " << bestMoney << std::endl;
+	outFile << "TOTAL MONEY: " << bestMoney << std::endl << std::endl;
+	outFile << "WRITES: " << fileWritesCounter << std::endl;
+	outFile << "Last file write: " << lastFileWrite << std::endl;
+	lastFileWrite = MyHelperUtils::currentTime();
+	outFile << "Current file write: " << lastFileWrite << std::endl << std::endl<<"Mines: " << std::endl;
+
+	for (Mine& ref_mine : *gameObject.ptrMines())
+	{
+		outFile << "Level: " << (int)ref_mine.getLevel() << " Depth: " << ref_mine.getHeight() << " ";
+		for (const HeightResource& height_resource : *ref_mine.getProductions())
+		{
+			outFile << height_resource.item->itemName() << ":" << height_resource.numberPercentageFraction() * ref_mine.getSpeed() << " ";
+		}
+		outFile << std::endl;
+	}
+	outFile << std::endl << "Chemical mines: " << std::endl;
+	for (Item* chem_production : chemProductions)
+	{
+		outFile << chem_production->itemName() << " " << gameObject.CHEM_MINE_SPEED << std::endl;
+	}
+	outFile << std::endl << "Active processes: " << std::endl;
+	
+	for (const Process* active_process : activeProcesses)
+	{
+		outFile << active_process->processor->itemName() << " :: ";
+		int rateIndex = 0;
+		for (const std::tuple<int, Item*>& output : active_process->outputs)
+		{
+			outFile << std::get<1>(output)->itemName() << ":" << active_process->itemRates[rateIndex++] << " ";
+		}
+		outFile << ";; ";
+		for (const std::tuple<int, Item*>& output : active_process->inputs)
+		{
+			outFile << std::get<1>(output)->itemName() << ":" << active_process->itemRates[rateIndex++] << " ";
+		}
+		outFile << std::endl;
+	}
+	outFile << std::endl;
 	outFile.close();
 }
 
@@ -98,6 +138,7 @@ char Optimizer::countProcessesOfType(const Process * const begin) const
 
 Optimizer::Optimizer(GameObjectContainer & pGameObject) :gameObject(pGameObject),
 itemIncomeArrayByIndex(gameObject.ptrItems()->size()),
+chemProductions(pGameObject.getChemMineNumber()),
 ptrOil(static_cast<const Item* const>(MyHelperUtils::findInVectorByString(*gameObject.ptrItems(), Item::findName(ItemName::OIL)))),
 ptrProcessSmelter(firstProcessOfType(Devices::SMELTER)),
 ptrProcessGemCrafter(firstProcessOfType(Devices::JEWELCRAFTER)),
@@ -109,17 +150,19 @@ numSmelterProc(countProcessesOfType(ptrProcessSmelter)),
 numGemCrafterProc(countProcessesOfType(ptrProcessGemCrafter)),
 numCrafterProc(countProcessesOfType(ptrProcessCrafter)),
 numGreenhouseProc(countProcessesOfType(ptrProcessGreenhouse)),
-numChemProc(countProcessesOfType(ptrProcessChem)),
-resultsFileName("optimizationResult" + std::to_string(MyHelperUtils::randomInt(0, 2000000)) + ".txt")
+numChemProc(countProcessesOfType(ptrProcessChem))
 {
 	// Oil is kind of special item, so I make pointer to it
-	//ptrOil = static_cast<Item*>MyHelperUtils::findInVectorByString(*gameObject.ptrItems(),
-	//	Item::findName(ItemName::OIL));
 	mineDistribution = new int[gameObject.getMaxDepth()];
 	for (int i = 0; i < gameObject.getMaxDepth(); ++i)
 	{
 		mineDistribution[i] = i;
 	}
+	do
+	{
+		resultsFileName = "optimizationResult" + std::to_string(MyHelperUtils::randomInt(0, 2000000)) + ".txt";
+
+	} while (std::ifstream(resultsFileName));
 }
 
 
@@ -195,7 +238,7 @@ Optimizer::~Optimizer()
 	delete[] mineDistribution;
 }
 
-#define COUT_SPEED_AT 1000
+#define COUT_SPEED_AT 10000
 
 void Optimizer::optimize()
 {
@@ -211,9 +254,10 @@ void Optimizer::optimize()
 		if(evaluations > COUT_SPEED_AT)
 		{
 			std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-			auto duration = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1).count();
-			std::cout << "Evaluations per second: " << (double)evaluations / duration <<std::endl;
+			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+			std::cout << "Evaluations per second: " << (double)evaluations / (duration*0.001) <<std::endl;
 			evaluations = 0;
+			t1 = std::chrono::high_resolution_clock::now();
 		}
 	}
 }

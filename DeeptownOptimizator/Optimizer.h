@@ -34,6 +34,8 @@ class Optimizer
 	std::vector<const Process*> activeProcesses;
 	double bestMoney = 0;
 	std::string resultsFileName;
+	int fileWritesCounter = 0;
+	std::string lastFileWrite = "never";
 
 
 	char countProcessesOfType(const Process* const begin) const;
@@ -41,7 +43,7 @@ class Optimizer
 	void setRandomProccess(const Process* process, const char num_smelter_proc);
 	void generateRandomSetup();
 	std::vector<int> setInfiniteItemsIndices() const;
-	void dumpFile() const;
+	void dumpFile();
 public:
 	const Process* firstProcessOfType(Devices devices) const;
 	Optimizer(GameObjectContainer & pGameObject);

@@ -117,5 +117,11 @@
     <None Include="Recipes.config">
       <Filter>ConfigFiles</Filter>
     </None>
+    <None Include="DepthInfo.config">
+      <Filter>ConfigFiles</Filter>
+    </None>
+    <None Include="PlayerSetup.config">
+      <Filter>ConfigFiles</Filter>
+    </None>
   </ItemGroup>
 </Project>

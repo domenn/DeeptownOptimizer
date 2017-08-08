@@ -7,7 +7,7 @@ HeightMapping::HeightMapping(short cHeight):
 {
 }
 
-void HeightMapping::addResource(const Item * const item, const int numberPercentage)
+void HeightMapping::addResource(const Item * const item, const double numberPercentage)
 {
 	// TODO emplace
 	// resources.emplace_back(numberPercentage, item);
