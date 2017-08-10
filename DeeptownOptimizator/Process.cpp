@@ -1,6 +1,7 @@
 #include "Process.h"
 
 
+int Process::currentPriorityNumber = 1;
 
 std::vector<double> Process::calculateRates() const
 {

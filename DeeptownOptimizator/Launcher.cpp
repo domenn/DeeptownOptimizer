@@ -9,9 +9,19 @@
 #include "Optimizer.h"
 #include <ctime>
 
+#ifdef _DEBUG
+#include <iostream>
+#endif
+
 Launcher::Launcher(int argc, std::string * argv)
 {
 	GameObjectContainer gameObject;
+#ifdef _DEBUG
+	auto ptrProcesses = gameObject.ptrProcesses();
+	for (int i = 0; i < ptrProcesses->size(); ++i) {
+		std::cout << i << " :: " << ptrProcesses->at(i).processor->itemName() << std::endl;
+	}
+#endif 
 	Optimizer optimizer(gameObject);
 	optimizer.optimize();
 	delete[] argv;

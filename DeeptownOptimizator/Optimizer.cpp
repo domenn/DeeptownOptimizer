@@ -31,17 +31,30 @@ void Optimizer::generateRandomSetup()
 	setRandomProccess(ptrProcessChem, numChemProc);
 	setRandomProccess(ptrProcessGemCrafter, numGemCrafterProc);
 	setRandomProccess(ptrProcessGreenhouse, numGreenhouseProc);
-
 }
 
 std::vector<int> Optimizer::setInfiniteItemsIndices() const
 {
 	return std::vector<int>{
-			((Item*)MyHelperUtils::findInVectorByString(*gameObject.ptrItems(), Item::findName(ItemName::WATER)))->getIndex(),
+		((Item*)MyHelperUtils::findInVectorByString(*gameObject.ptrItems(), Item::findName(ItemName::WATER)))->getIndex(),
 			((Item*)MyHelperUtils::findInVectorByString(*gameObject.ptrItems(), Item::findName(ItemName::LIANA_SEED)))->getIndex(),
 			((Item*)MyHelperUtils::findInVectorByString(*gameObject.ptrItems(), Item::findName(ItemName::TREE_SEED)))->getIndex(),
 			((Item*)MyHelperUtils::findInVectorByString(*gameObject.ptrItems(), Item::findName(ItemName::GRAPE_SEED)))->getIndex()
 	};
+}
+
+bool checkIfInputContainsOutput(const std::vector<std::tuple<int, Item*>>& leftInputs, const std::vector<std::tuple<int, Item*>>& rightOutputs) {
+	for (auto& var : leftInputs)
+	{
+		for (auto& var1 : rightOutputs) {
+			auto ptrItemLeft = std::get<1>(var);
+			auto ptrItemRight = std::get<1>(var1);
+			if (ptrItemLeft->equals(ptrItemRight)) {
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 void Optimizer::dumpFile()
@@ -72,7 +85,7 @@ void Optimizer::dumpFile()
 	outFile << "WRITES: " << fileWritesCounter << std::endl;
 	outFile << "Last file write: " << lastFileWrite << std::endl;
 	lastFileWrite = MyHelperUtils::currentTime();
-	outFile << "Current file write: " << lastFileWrite << std::endl << std::endl<<"Mines: " << std::endl;
+	outFile << "Current file write: " << lastFileWrite << std::endl << std::endl << "Mines: " << std::endl;
 
 	for (Mine& ref_mine : *gameObject.ptrMines())
 	{
@@ -89,7 +102,7 @@ void Optimizer::dumpFile()
 		outFile << chem_production->itemName() << " " << gameObject.CHEM_MINE_SPEED << std::endl;
 	}
 	outFile << std::endl << "Active processes: " << std::endl;
-	
+
 	for (const Process* active_process : activeProcesses)
 	{
 		outFile << active_process->processor->itemName() << " :: ";
@@ -111,13 +124,22 @@ void Optimizer::dumpFile()
 
 const Process* Optimizer::firstProcessOfType(Devices device) const
 {
+#ifdef _DEBUG
+	int indx = 0;
+#endif
 	auto strToFind = Item::findName(device);
 	for (auto i = gameObject.ptrProcesses()->data(); ; ++i)
 	{
 		if (strToFind == i->processor->itemName())
 		{
+#ifdef _DEBUG
+			std::cout << "Found process: " << strToFind << " :: " << i << " :: " << indx << std::endl;
+#endif
 			return i;
 		}
+#ifdef _DEBUG
+		++ indx;
+#endif
 	}
 }
 
@@ -132,6 +154,9 @@ char Optimizer::countProcessesOfType(const Process * const begin) const
 		++num;
 		++iterator;
 	}
+#ifdef _DEBUG
+	std::cout << "Count: " << begin->processor->itemName() << " :: " << (int)num << std::endl;
+#endif
 	return num;
 }
 
@@ -163,9 +188,49 @@ numChemProc(countProcessesOfType(ptrProcessChem))
 		resultsFileName = "optimizationResult" + std::to_string(MyHelperUtils::randomInt(0, 2000000)) + ".txt";
 
 	} while (std::ifstream(resultsFileName));
+	// Set priorities based on which depend on smth.
+	std::vector<Process*> priorityDistrib;
+	int tmpProccSize = gameObject.ptrProcesses()->size();
+	for (int i = 0; i < tmpProccSize; ++i) {
+		priorityDistrib.push_back(gameObject.ptrProcesses()->data() + i);
+	}
+	auto ptrProcVector = gameObject.ptrProcesses();
+	bool fixed = false;
+	while (!fixed) {
+		fixed = true;
+		int indexLeft = 0, indexRight = 1;
+		for (indexLeft = 0; indexLeft < tmpProccSize - 1; ++indexLeft) {
+			for (indexRight = indexLeft + 1; indexRight < tmpProccSize; ++indexRight)
+			{
+				// if outputs of right are in inputs of left, then left ddepends on right ... not OK. We want only right depends on left
+				auto& leftInputs = priorityDistrib.at(indexLeft)->inputs;
+				auto& rightOutputs = priorityDistrib.at(indexRight)->outputs;
+				std::string mstr(std::get<1>(rightOutputs[0])->itemName());
+				if (std::get<1>(rightOutputs[0])->itemName() == "POLISHED_EMERALD" && std::get<1>(priorityDistrib.at(indexLeft)->outputs[0])->itemName() == "GREEN_LASER") {
+
+					if (false) { continue; }
+				}
+				bool depends = checkIfInputContainsOutput(leftInputs, rightOutputs);
+
+				if (depends) {
+					fixed = false;
+					auto ptrRight = priorityDistrib.at(indexRight);
+					priorityDistrib.erase(priorityDistrib.begin() + indexRight);
+					priorityDistrib.insert(priorityDistrib.begin() + indexLeft, ptrRight);
+					break;
+				}
+			}
+		}
+	}
+	// Write priorities back into objects
+	for (int i = 0; i < priorityDistrib.size(); ++i) {
+		priorityDistrib[i]->priorityNumber = i;
+	}
 }
 
-
+bool comparePriorities(const Process* p1, const Process* p2) {
+	return p1->priorityNumber < p2->priorityNumber;
+}
 
 void Optimizer::calculateMoney() {
 	// Reset vector to zero
@@ -200,13 +265,31 @@ void Optimizer::calculateMoney() {
 	// don't yet have info on crafter produced resources ... Well probably this can be handled 
 	// if I allow sub-zero quantities of materials
 
+	//Processes must be sorted ... high priority first, etc
+	std::sort(activeProcesses.begin(), activeProcesses.end(), comparePriorities);
+
 	// Calculate for all processing devices
+	// WTF is this code? SO COMPLICATED
 	for (const Process* active_process : activeProcesses)
 	{
-		//std::cout << active_process->processor->itemName() << std::endl;
+		double activeness = 1;
+#ifdef _DEBUG
+		std::cout << active_process->processor->itemName() << std::endl;
+#endif
 		for (int i = 0; i < active_process->itemIndices.size(); ++i)
 		{
-			itemIncomeArrayByIndex[active_process->itemIndices[i]] += active_process->itemRates[i];
+			// TODO this is not so simple anymore ... I have to first see if any number is send below zero. If yes, reduce UPDATE .. test
+			double currentState = itemIncomeArrayByIndex[active_process->itemIndices[i]];
+			if (currentState + active_process->itemRates[i] < 0) {
+				double localActiv = currentState / ((-1)*active_process->itemRates[i]);
+				if (localActiv < activeness) {
+					activeness = localActiv;
+				}
+			}
+		}
+		for (int i = 0; i < active_process->itemIndices.size(); ++i)
+		{
+			itemIncomeArrayByIndex[active_process->itemIndices[i]] += active_process->itemRates[i] * activeness;
 		}
 	}
 
@@ -217,18 +300,18 @@ void Optimizer::calculateMoney() {
 	{
 		money += gameObject.ptrItems()->at(i).price * itemIncomeArrayByIndex[i];
 	}
-	if(money > bestMoney)
+	if (money > bestMoney)
 	{
 		bestMoney = money;
 		dumpFile();
 	}
 }
 
-void Optimizer::setRandomProccess(const Process* process, const char num_smelter_proc)
+void Optimizer::setRandomProccess(const Process* process, const char numberOfSpecificProcesses)
 {
 	auto numberOfDevices = process->processor->numberOfThem;
 	for (int i = 0; i < numberOfDevices; ++i) {
-		activeProcesses.push_back(process + MyHelperUtils::randomInt(0, numSmelterProc));
+		activeProcesses.push_back(process + MyHelperUtils::randomInt(0, numberOfSpecificProcesses));
 	}
 }
 
@@ -244,18 +327,18 @@ void Optimizer::optimize()
 {
 	int evaluations = 0;
 	std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-	
+
 
 
 	while (true) {
 		generateRandomSetup();
 		calculateMoney();
 		++evaluations;
-		if(evaluations > COUT_SPEED_AT)
+		if (evaluations > COUT_SPEED_AT)
 		{
 			std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-			std::cout << "Evaluations per second: " << (double)evaluations / (duration*0.001) <<std::endl;
+			std::cout << "Evaluations per second: " << (double)evaluations / (duration*0.001) << std::endl;
 			evaluations = 0;
 			t1 = std::chrono::high_resolution_clock::now();
 		}
