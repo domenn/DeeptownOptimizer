@@ -2,27 +2,6 @@
 #include <vector>
 #include <sstream>
 
-/*
-
-#define SOME_ENUM(DO) \
-DO(Foo) \
-DO(Bar) \
-DO(Baz)
-
-#define MAKE_ENUM(VAR) VAR,
-enum MetaSyntacticVariable{
-SOME_ENUM(MAKE_ENUM)
-};
-
-#define MAKE_STRINGS(VAR) #VAR,
-const char* const MetaSyntacticVariableNames[] = {
-SOME_ENUM(MAKE_STRINGS)
-};
-
-*/
-
-
-
 #define AWESOME_MAKE_ENUM(name, ...) enum class name { __VA_ARGS__, __COUNT}; \
 inline std::ostream& operator<<(std::ostream& os, name value) { \
 std::string enumName = #name; \
@@ -115,5 +94,18 @@ AWESOME_MAKE_ENUM(ItemName,
 	SULFRIC_ACID,
 	ETHANOL,
 	REFINED_OIL,
-	PLASTIC
+	PLASTIC,
+
+	ALEXANDRITE,
+	URANIUM,
+	TITANIUM,
+	POLISHED_ALEXANDRITE,
+	GUNPOWDER,
+	TITANIUM_ORE,
+	TITANIUM_BAR,
+	DIETHYL_ETHER,
+	URANIUM_ROD,
+	GEAR,
+	BOMB
+
 );
